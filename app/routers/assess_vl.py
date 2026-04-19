@@ -1,10 +1,11 @@
 from fastapi import APIRouter
 from app.models.schemas import AssessVLRequest, AssessVLResponse
+from app.services.pilot_logger import log_event
 
 router = APIRouter()
 
-# Rule-based: correct answers and topic area per question
-QUESTIONS = {
+# Correct answers keyed by question_id — Spring Boot holds the question text and options
+ANSWER_KEY = {
     "q1": {"correct": "b", "area": "Чтение базовых графиков"},
     "q2": {"correct": "c", "area": "Выявление трендов"},
     "q3": {"correct": "a", "area": "Интерпретация статистических визуализаций"},
@@ -23,15 +24,15 @@ async def assess_vl(request: AssessVLRequest):
 
     for response in request.responses:
         qid = response.question_id
-        if qid not in QUESTIONS:
+        if qid not in ANSWER_KEY:
             continue
-        q = QUESTIONS[qid]
+        q = ANSWER_KEY[qid]
         if response.answer == q["correct"]:
             correct_count += 1
         else:
             weak_areas.append(q["area"])
 
-    score = correct_count / len(QUESTIONS)
+    score = correct_count / len(ANSWER_KEY)
 
     if score >= 0.75:
         vl_level = "advanced"
@@ -43,9 +44,16 @@ async def assess_vl(request: AssessVLRequest):
         vl_level = "beginner"
         complexity = "simple"
 
-    return AssessVLResponse(
+    result = AssessVLResponse(
         vl_level=vl_level,
         score=round(score, 2),
         recommended_dashboard_complexity=complexity,
         weak_areas=weak_areas,
     )
+    log_event("assess_vl", {
+        "teacher_id": request.teacher_id,
+        "vl_level": vl_level,
+        "score": result.score,
+        "weak_areas": weak_areas,
+    })
+    return result

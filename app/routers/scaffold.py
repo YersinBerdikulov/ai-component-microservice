@@ -2,6 +2,7 @@ from fastapi import APIRouter
 from app.models.schemas import ScaffoldRequest, ScaffoldResponse
 from app.services import llm_router
 from app.services.json_utils import extract_json
+from app.services.pilot_logger import log_event
 from app.prompts import scaffold_prompts
 
 router = APIRouter()
@@ -23,11 +24,20 @@ async def get_scaffold_hint(request: ScaffoldRequest):
 
     try:
         data = extract_json(raw)
-        return ScaffoldResponse(**data)
+        response = ScaffoldResponse(**data)
     except Exception:
-        return ScaffoldResponse(
+        response = ScaffoldResponse(
             hint=raw,
             hint_type="guiding_question",
             difficulty_adjusted=True,
             next_suggested_action="Продолжите анализ данных",
         )
+
+    log_event("scaffold", {
+        "teacher_id": request.teacher_id,
+        "scenario_id": request.scenario_id,
+        "current_step": request.current_step,
+        "vl_level": request.vl_level,
+        "hint_type": response.hint_type,
+    })
+    return response

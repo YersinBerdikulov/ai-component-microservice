@@ -2,6 +2,7 @@ from fastapi import APIRouter
 from app.models.schemas import ChatRequest, ChatResponse
 from app.services import llm_router, chat_history
 from app.services.json_utils import extract_json
+from app.services.pilot_logger import log_event
 from app.prompts import chat_prompts
 
 router = APIRouter()
@@ -43,4 +44,11 @@ async def chat(request: ChatRequest):
 
     await chat_history.save_message(request.teacher_id, request.scenario_id, request.message, reply)
 
+    log_event("chat", {
+        "teacher_id": request.teacher_id,
+        "scenario_id": request.scenario_id,
+        "vl_level": request.vl_level,
+        "current_step": request.task_context.current_step,
+        "n_suggested_actions": len(suggested_actions),
+    })
     return ChatResponse(reply=reply, suggested_actions=suggested_actions, references=references)

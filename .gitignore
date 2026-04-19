@@ -1,10 +1,13 @@
 .env
+logs/
 venv/
 __pycache__/
 *.pyc
 *.pyo
 .pytest_cache/
 data/model.pkl
+# scenario JSONs are version-controlled, only exclude the ML model
+!data/scenarios/
 *.egg-info/
 dist/
 .DS_Store

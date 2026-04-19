@@ -111,3 +111,27 @@ class ChatResponse(BaseModel):
     reply: str
     suggested_actions: List[str]
     references: List[str]
+
+
+class ExecutionResult(BaseModel):
+    output: Optional[str] = None   # stdout / query result as string
+    error: Optional[str] = None    # error message if code failed
+
+
+class GradeRequest(BaseModel):
+    teacher_id: str
+    task_id: str
+    task_description: str          # what the task asked the teacher to do
+    expected_approach: str         # rubric / correct method description
+    submitted_code: str            # the code the teacher wrote
+    execution_result: ExecutionResult
+    vl_level: str
+
+
+class GradeResponse(BaseModel):
+    score: float                   # 0.0 – 1.0
+    grade_label: str               # "Отлично" | "Хорошо" | "Удовлетворительно" | "Неудовлетворительно"
+    is_correct: bool
+    feedback: str                  # main narrative feedback
+    code_issues: List[str]         # specific code problems found
+    recommendations: List[str]     # concrete next steps

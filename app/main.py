@@ -5,7 +5,7 @@ import logging
 import os
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from app.routers import scaffold, predict, report, assess_vl, chat
+from app.routers import scaffold, predict, report, assess_vl, chat, pilot, grade
 from app.middleware.logging import RequestLoggingMiddleware
 
 logging.basicConfig(
@@ -33,6 +33,8 @@ app.include_router(predict.router, prefix="/api/v1", tags=["predict"])
 app.include_router(report.router, prefix="/api/v1", tags=["report"])
 app.include_router(assess_vl.router, prefix="/api/v1", tags=["assess-vl"])
 app.include_router(chat.router, prefix="/api/v1", tags=["chat"])
+app.include_router(pilot.router, prefix="/api/v1", tags=["pilot"])
+app.include_router(grade.router, prefix="/api/v1", tags=["grade"])
 
 
 @app.get("/health", tags=["health"])
