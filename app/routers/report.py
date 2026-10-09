@@ -1,9 +1,10 @@
 from fastapi import APIRouter
+
 from app.models.schemas import ReportRequest, ReportResponse
+from app.prompts import report_prompts
 from app.services import llm_router
 from app.services.json_utils import extract_json
 from app.services.pilot_logger import log_event
-from app.prompts import report_prompts
 
 router = APIRouter()
 

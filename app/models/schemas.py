@@ -1,10 +1,10 @@
+
 from pydantic import BaseModel
-from typing import Optional, List
 
 
 class ScaffoldContext(BaseModel):
     scenario_name: str
-    available_data: List[str]
+    available_data: list[str]
     objective: str
 
 
@@ -35,18 +35,18 @@ class StudentData(BaseModel):
 
 
 class PredictRequest(BaseModel):
-    student_data: List[StudentData]
+    student_data: list[StudentData]
 
 
 class StudentPrediction(BaseModel):
     student_id: str
     risk_score: float
     risk_level: str
-    top_risk_factors: List[str]
+    top_risk_factors: list[str]
 
 
 class PredictResponse(BaseModel):
-    predictions: List[StudentPrediction]
+    predictions: list[StudentPrediction]
 
 
 class DecisionLog(BaseModel):
@@ -64,14 +64,14 @@ class StudentOutcome(BaseModel):
 class ReportRequest(BaseModel):
     teacher_id: str
     scenario_id: str
-    decisions_log: List[DecisionLog]
-    student_outcomes: List[StudentOutcome]
+    decisions_log: list[DecisionLog]
+    student_outcomes: list[StudentOutcome]
 
 
 class ReportResponse(BaseModel):
     report_text: str
-    strengths: List[str]
-    areas_for_improvement: List[str]
+    strengths: list[str]
+    areas_for_improvement: list[str]
     score: float
 
 
@@ -82,20 +82,20 @@ class VLResponse(BaseModel):
 
 class AssessVLRequest(BaseModel):
     teacher_id: str
-    responses: List[VLResponse]
+    responses: list[VLResponse]
 
 
 class AssessVLResponse(BaseModel):
     vl_level: str
     score: float
     recommended_dashboard_complexity: str
-    weak_areas: List[str]
+    weak_areas: list[str]
 
 
 class TaskContext(BaseModel):
     current_step: str
-    available_data: List[str]
-    visible_dashboard: Optional[str] = None
+    available_data: list[str]
+    visible_dashboard: str | None = None
     scenario_objective: str
 
 
@@ -109,13 +109,13 @@ class ChatRequest(BaseModel):
 
 class ChatResponse(BaseModel):
     reply: str
-    suggested_actions: List[str]
-    references: List[str]
+    suggested_actions: list[str]
+    references: list[str]
 
 
 class ExecutionResult(BaseModel):
-    output: Optional[str] = None   # stdout / query result as string
-    error: Optional[str] = None    # error message if code failed
+    output: str | None = None   # stdout / query result as string
+    error: str | None = None    # error message if code failed
 
 
 class GradeRequest(BaseModel):
@@ -133,5 +133,5 @@ class GradeResponse(BaseModel):
     grade_label: str               # "Отлично" | "Хорошо" | "Удовлетворительно" | "Неудовлетворительно"
     is_correct: bool
     feedback: str                  # main narrative feedback
-    code_issues: List[str]         # specific code problems found
-    recommendations: List[str]     # concrete next steps
+    code_issues: list[str]         # specific code problems found
+    recommendations: list[str]     # concrete next steps

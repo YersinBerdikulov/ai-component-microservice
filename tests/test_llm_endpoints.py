@@ -1,7 +1,7 @@
 """Tests for LLM-powered endpoints using mocked llm_router.generate."""
 import json
-import pytest
 from unittest.mock import AsyncMock, patch
+
 from fastapi.testclient import TestClient
 
 from app.main import app

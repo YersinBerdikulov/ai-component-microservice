@@ -1,6 +1,7 @@
 from fastapi import APIRouter
-from app.models.schemas import PredictRequest, PredictResponse, StudentPrediction
+
 from app.ml import predictor
+from app.models.schemas import PredictRequest, PredictResponse, StudentPrediction
 
 router = APIRouter()
 

@@ -4,7 +4,7 @@ Used during апробация to collect empirical data for analysis.
 """
 import json
 import os
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 
 LOG_PATH = Path(os.getenv("PILOT_LOG_PATH", "logs/pilot_events.jsonl"))
@@ -14,7 +14,7 @@ def log_event(event_type: str, payload: dict) -> None:
     try:
         LOG_PATH.parent.mkdir(parents=True, exist_ok=True)
         record = {
-            "ts": datetime.now(timezone.utc).isoformat(),
+            "ts": datetime.now(UTC).isoformat(),
             "event": event_type,
             **payload,
         }

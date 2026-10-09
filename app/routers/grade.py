@@ -1,9 +1,10 @@
 from fastapi import APIRouter
+
 from app.models.schemas import GradeRequest, GradeResponse
+from app.prompts import grade_prompts
 from app.services import llm_router
 from app.services.json_utils import extract_json
 from app.services.pilot_logger import log_event
-from app.prompts import grade_prompts
 
 router = APIRouter()
 

@@ -1,9 +1,10 @@
 from fastapi import APIRouter
+
 from app.models.schemas import ChatRequest, ChatResponse
-from app.services import llm_router, chat_history
+from app.prompts import chat_prompts
+from app.services import chat_history, llm_router
 from app.services.json_utils import extract_json
 from app.services.pilot_logger import log_event
-from app.prompts import chat_prompts
 
 router = APIRouter()
 

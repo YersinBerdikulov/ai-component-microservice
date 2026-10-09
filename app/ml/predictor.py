@@ -1,6 +1,7 @@
 import pickle
-import numpy as np
 from pathlib import Path
+
+import numpy as np
 
 MODEL_PATH = Path("data/model.pkl")
 FEATURES = [

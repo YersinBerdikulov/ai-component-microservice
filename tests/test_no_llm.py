@@ -1,5 +1,4 @@
 """Tests for endpoints that do not require LLM or Redis."""
-import pytest
 from fastapi.testclient import TestClient
 
 from app.main import app

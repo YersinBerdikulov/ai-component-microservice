@@ -1,6 +1,5 @@
 import json
 import os
-from typing import List, Dict
 
 MAX_HISTORY = 50
 TTL_SECONDS = 86400  # 24 hours
@@ -13,7 +12,7 @@ def _get_redis():
     return aioredis.from_url(url)
 
 
-async def get_history(teacher_id: str, scenario_id: str) -> List[Dict]:
+async def get_history(teacher_id: str, scenario_id: str) -> list[dict]:
     try:
         r = _get_redis()
         key = f"chat:{teacher_id}:{scenario_id}"

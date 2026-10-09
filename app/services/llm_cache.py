@@ -1,5 +1,4 @@
 import hashlib
-import json
 import os
 
 TTL_SECONDS = 3600  # 1 hour

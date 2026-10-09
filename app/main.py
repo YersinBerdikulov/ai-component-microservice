@@ -1,12 +1,15 @@
 from dotenv import load_dotenv
+
 load_dotenv()
 
 import logging
 import os
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from app.routers import scaffold, predict, report, assess_vl, chat, pilot, grade
+
 from app.middleware.logging import RequestLoggingMiddleware
+from app.routers import assess_vl, chat, grade, pilot, predict, report, scaffold
 
 logging.basicConfig(
     level=os.getenv("LOG_LEVEL", "INFO"),
