@@ -1,5 +1,6 @@
 """Tests for shared utilities."""
 import pytest
+
 from app.services.json_utils import extract_json
 
 
@@ -24,5 +25,5 @@ def test_whitespace_around_json():
 
 
 def test_invalid_json_raises():
-    with pytest.raises(Exception):
+    with pytest.raises(ValueError):  # json.JSONDecodeError subclasses ValueError
         extract_json("this is not json")
