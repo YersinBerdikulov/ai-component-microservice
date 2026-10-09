@@ -2,12 +2,12 @@
 name = "ai-microservice"
 version = "1.0.0"
 description = "AI microservice for an educational data analysis simulator"
-requires-python = ">=3.11"
+requires-python = ">=3.12"
 license = { text = "MIT" }
 
 [tool.ruff]
 line-length = 120
-target-version = "py311"
+target-version = "py312"
 extend-exclude = ["venv"]
 
 [tool.ruff.lint]

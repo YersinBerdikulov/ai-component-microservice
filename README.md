@@ -1,7 +1,7 @@
 # AI Simulator Service
 
 [![CI/CD](../../actions/workflows/ci.yml/badge.svg)](../../actions/workflows/ci.yml)
-![Python](https://img.shields.io/badge/python-3.11%20%7C%203.12-blue)
+![Python](https://img.shields.io/badge/python-3.12%20%7C%203.13-blue)
 ![License](https://img.shields.io/badge/license-MIT-green)
 
 AI microservice for a digital simulator in which teachers practise **educational data analysis**.
@@ -114,7 +114,7 @@ Pipeline: [`.github/workflows/ci.yml`](.github/workflows/ci.yml)
 push / pull request
    │
    ▼
- lint ──▶ test (Python 3.11, 3.12 + Redis service) ──▶ docker build ──▶ smoke test ──▶ push to GHCR
+ lint ──▶ test (Python 3.12, 3.13 + Redis service) ──▶ docker build ──▶ smoke test ──▶ push to GHCR
           coverage + JUnit reports as artifacts                  (/health, /predict)   (push events only)
 ```
 

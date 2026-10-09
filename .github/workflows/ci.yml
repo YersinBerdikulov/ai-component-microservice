@@ -36,7 +36,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: ["3.11", "3.12"]
+        python-version: ["3.12", "3.13"]   # pinned numpy 2.5 requires Python >= 3.12
     services:
       # Real Redis so the cache and chat-history code paths run as in production
       redis:
