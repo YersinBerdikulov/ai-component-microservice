@@ -12,4 +12,6 @@ data/model.pkl
 dist/
 .DS_Store
 .claude
-requirements.txt
+.coverage
+coverage.xml
+.ruff_cache/
