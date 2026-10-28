@@ -2,7 +2,6 @@ venv/
 .env
 .git/
 .github/
-tests/
 logs/
 data/model.pkl
 __pycache__/
@@ -11,4 +10,10 @@ __pycache__/
 .ruff_cache/
 .coverage
 coverage.xml
+reports/
 .claude
+# CI/CD and docs are not part of the image
+Jenkinsfile
+jenkins/
+k8s/
+docs/
