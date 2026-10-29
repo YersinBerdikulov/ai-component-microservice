@@ -1,0 +1,22 @@
+# Local Jenkins server for the CI/CD pipeline.
+#   docker compose -f jenkins/docker-compose.yml up -d --build
+#   open http://localhost:8080
+# See docs/JENKINS_SETUP.md for the full setup.
+
+services:
+  jenkins:
+    build: .
+    image: ai-sim-jenkins:lts
+    container_name: jenkins
+    # Root is needed to use the host Docker socket on Docker Desktop.
+    # Acceptable for a local, single-user CI server only.
+    user: root
+    ports:
+      - "8080:8080"
+    volumes:
+      - jenkins_home:/var/jenkins_home
+      - /var/run/docker.sock:/var/run/docker.sock
+    restart: unless-stopped
+
+volumes:
+  jenkins_home:
