@@ -102,8 +102,14 @@ pipeline {
             steps {
                 withCredentials([file(credentialsId: 'minikube-kubeconfig', variable: 'KUBECONFIG')]) {
                     sh '''
-                        # No registry: stream the image into the Docker engine of the Minikube node
-                        docker save $IMAGE:$TAG $IMAGE:latest | docker exec -i $MINIKUBE_NODE docker load
+                        # No registry: stream the image into the container runtime of the Minikube node
+                        # (containerd by default since Minikube 1.39, Docker in older versions)
+                        if docker exec $MINIKUBE_NODE docker info >/dev/null 2>&1; then
+                            loader="docker load"
+                        else
+                            loader="ctr -n k8s.io images import -"
+                        fi
+                        docker save $IMAGE:$TAG $IMAGE:latest | docker exec -i $MINIKUBE_NODE $loader
 
                         kubectl apply -f k8s/00-namespace.yaml -f k8s/10-redis.yaml -f k8s/30-service.yaml
                         sed "s|image: ai-sim-service:latest|image: $IMAGE:$TAG|" k8s/20-ai-sim.yaml | kubectl apply -f -

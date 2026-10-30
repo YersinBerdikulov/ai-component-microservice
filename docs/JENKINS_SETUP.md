@@ -128,5 +128,5 @@ kubectl -n ai-sim rollout restart deployment/ai-sim
 | `permission denied ... docker.sock` | The container must run as root (`user: root` in the compose file); recreate it with `up -d --build` |
 | `Unable to connect to the server` / `no such host minikube` | Run `docker network connect minikube jenkins` again; the connection is lost when Minikube or the Jenkins container is recreated |
 | Certificate errors after `minikube delete` | A new cluster has new certificates: regenerate the kubeconfig and update the credential |
-| Pods stay in `ErrImageNeverPull` | The image was not loaded into the node. Minikube must use the Docker runtime (the default for `--driver=docker`) |
+| Pods stay in `ErrImageNeverPull` | The image was not loaded into the node. The pipeline uses `ctr images import` for containerd (Minikube 1.39+ default) and `docker load` for the Docker runtime; check with `docker exec minikube crictl images` |
 | `Failed to connect to repository` | The repository must be public, or add GitHub credentials to the job |
