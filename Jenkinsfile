@@ -19,6 +19,12 @@ pipeline {
         IMAGE = 'ai-sim-service'
         // Prefix for the throwaway containers and network of this build
         CI_ID = "ai-sim-ci-${env.BUILD_NUMBER}"
+        // Minikube (docker driver) runs as a container with this name on the host engine
+        MINIKUBE_NODE = 'minikube'
+    }
+
+    parameters {
+        booleanParam(name: 'DEPLOY', defaultValue: true, description: 'Deploy to Minikube after all checks pass')
     }
 
     stages {
@@ -88,6 +94,28 @@ pipeline {
                 }
             }
         }
+
+        stage('Deploy to Minikube') {
+            when {
+                expression { params.DEPLOY }
+            }
+            steps {
+                withCredentials([file(credentialsId: 'minikube-kubeconfig', variable: 'KUBECONFIG')]) {
+                    sh '''
+                        # No registry: stream the image into the Docker engine of the Minikube node
+                        docker save $IMAGE:$TAG $IMAGE:latest | docker exec -i $MINIKUBE_NODE docker load
+
+                        kubectl apply -f k8s/00-namespace.yaml -f k8s/10-redis.yaml -f k8s/30-service.yaml
+                        sed "s|image: ai-sim-service:latest|image: $IMAGE:$TAG|" k8s/20-ai-sim.yaml | kubectl apply -f -
+                        kubectl -n ai-sim rollout status deployment/ai-sim --timeout=180s
+
+                        # Same smoke test, now inside a pod of the new deployment
+                        kubectl -n ai-sim exec -i deploy/ai-sim -- python - < scripts/smoke_test.py
+                        kubectl -n ai-sim get pods,svc -o wide
+                    '''
+                }
+            }
+        }
     }
 
     post {
@@ -99,7 +127,7 @@ pipeline {
             '''
         }
         success {
-            echo "Image $IMAGE:$TAG built and verified"
+            echo "Image ${env.IMAGE}:${env.TAG} built, verified${params.DEPLOY ? ' and deployed to Minikube' : ''}"
         }
     }
 }
