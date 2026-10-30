@@ -81,24 +81,14 @@ jobs:
       - name: Normalise image name (registry requires lowercase)
         run: echo "IMAGE=$(echo $IMAGE_NAME | tr '[:upper:]' '[:lower:]')" >> $GITHUB_ENV
 
-      - name: Build image
-        run: docker build -t $IMAGE:${{ github.sha }} .
+      - name: Build runtime image
+        run: docker build --target runtime -t $IMAGE:${{ github.sha }} .
 
-      - name: Smoke test /health
+      # Same check as the Jenkins pipeline: /health and the ML endpoint /api/v1/predict
+      - name: Smoke test
         run: |
           docker run -d --name ai-service -p 8100:8100 $IMAGE:${{ github.sha }}
-          for i in $(seq 1 20); do
-            if curl -fs http://localhost:8100/health; then echo; echo "healthy"; exit 0; fi
-            sleep 2
-          done
-          docker logs ai-service
-          exit 1
-
-      - name: Smoke test /predict (ML model, no LLM)
-        run: |
-          curl -fs -X POST http://localhost:8100/api/v1/predict \
-            -H "Content-Type: application/json" \
-            -d '{"student_data":[{"student_id":"s1","attendance_rate":0.2,"assignment_completion":0.1,"avg_grade":20,"forum_posts":0,"time_on_platform":1,"late_submissions":15}]}'
+          python3 scripts/smoke_test.py http://localhost:8100 || { docker logs ai-service; exit 1; }
 
       # CD: publish the image only for pushes to the default branch or version tags
       - name: Log in to GitHub Container Registry
