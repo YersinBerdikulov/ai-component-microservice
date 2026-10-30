@@ -64,6 +64,8 @@ Design decisions:
 | **pytest + pytest-cov** | De-facto Python testing standard; LLM calls are mocked so tests are fast, free and deterministic. |
 | **Ruff** | Very fast linter that replaces flake8 + isort + pyupgrade in one tool. |
 | **GitHub Actions** | Built into GitHub, free for public repositories, needs no separate CI server. |
+| **Jenkins** | Self-hosted CI/CD server with declarative pipelines as code; runs the same checks locally and deploys to Kubernetes. |
+| **Kubernetes (Minikube)** | Replicas, health probes and rolling updates keep the service stable during the pilot; Minikube gives a full cluster on a laptop. |
 
 ## Getting started
 
@@ -73,6 +75,10 @@ Design decisions:
 cp .env.example .env        # add at least one LLM API key
 docker compose up --build
 ```
+
+The [Dockerfile](Dockerfile) is multi-stage: `test` (dev tools and tests, used by CI) and `runtime`
+(application only, non-root user, health check). Build the production image with
+`docker build --target runtime -t ai-sim-service .`
 
 ### Option 2 — local Python
 
@@ -108,6 +114,27 @@ Tests write pilot events to a temporary file, so they never touch the real resea
 
 ## CI/CD
 
+The project has two pipelines that run the same checks.
+
+### Jenkins → Kubernetes
+
+Pipeline: [`Jenkinsfile`](Jenkinsfile). Setup guide: [docs/JENKINS_SETUP.md](docs/JENKINS_SETUP.md)
+
+```
+commit (Poll SCM, 2 min)
+   │
+   ▼
+checkout ─▶ build test image ─▶ lint ─▶ unit tests ─▶ build runtime image ─▶ smoke test ─▶ deploy to Minikube
+tag <build>-<sha>               ruff    pytest+Redis   ai-sim-service:<tag>   /health,      rollout + smoke
+                                        JUnit report                          /predict      test in a pod
+```
+
+- Jenkins runs locally in Docker ([jenkins/](jenkins)) and builds images on the host Docker engine.
+- **Continuous deployment:** the verified image is loaded into Minikube and rolled out to the
+  `ai-sim` namespace ([k8s/](k8s)): two replicas of the service, Redis, NodePort service on port 30810.
+
+### GitHub Actions → GHCR
+
 Pipeline: [`.github/workflows/ci.yml`](.github/workflows/ci.yml)
 
 ```
@@ -120,7 +147,7 @@ push / pull request
 
 - **Continuous integration:** every push and pull request is linted and tested on two Python versions,
   with a real Redis service container.
-- **Continuous delivery:** after the tests pass, the Docker image is built, started and checked with real
+- **Continuous delivery:** after the tests pass, the runtime image is built, started and checked with real
   HTTP requests. On pushes to the default branch and on `v*` tags, the image is published to
   GitHub Container Registry as `ghcr.io/<owner>/<repo>:latest`, `:<commit-sha>` and `:<tag>`.
 
@@ -135,7 +162,12 @@ app/
   prompts/           LLM prompt templates
   models/schemas.py  Pydantic request/response models
 tests/               pytest suite
-.github/workflows/   CI/CD pipeline
+scripts/             smoke test used by both pipelines
+Jenkinsfile          Jenkins pipeline
+jenkins/             local Jenkins server (Docker Compose)
+k8s/                 Kubernetes manifests
+docs/                Jenkins setup guide
+.github/workflows/   GitHub Actions pipeline
 ```
 
 ## License

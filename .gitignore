@@ -15,3 +15,6 @@ dist/
 .coverage
 coverage.xml
 .ruff_cache/
+# kubeconfig with Minikube client certificates for Jenkins (docs/JENKINS_SETUP.md)
+jenkins-kubeconfig.yaml
+reports/
